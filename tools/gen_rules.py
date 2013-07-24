@@ -76,7 +76,7 @@ def _write_rule(module_file, conditions, actions):
             module_file.write('            ({}) and \\\n'.format(condition))
         module_file.write('            ({}):\n'.format(conditions[-1]))
     for action in actions:
-        if action.startswith('CoordAndDims(DimCoord('):
+        if action.startswith('CoordAndDims(DimCoord'):
             match = re.match(r'CoordAndDims\((.*), ([0-1]+)\)$', action)
             if match:
                 action = 'cube.add_dim_coord({})'.format(action[13:-1])
