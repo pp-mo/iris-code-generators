@@ -83,7 +83,7 @@ def _write_rule(module_file, conditions, actions):
             module_file.write('            ({}) and \\\n'.format(condition))
         module_file.write('            ({}):\n'.format(conditions[-1]))
     for action in actions:
-        if action.startswith('CoordAndDims(DimCoord('):
+        if action.startswith('CoordAndDims(DimCoord'):
             match = re.match(r'CoordAndDims\((.*), ([0-1]+)\)$', action)
             if match:
                 fmt = 'dim_coords_and_dims.append(({}))'

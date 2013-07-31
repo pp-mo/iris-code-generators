@@ -97,7 +97,7 @@ f.bdx != 0.0
 len(f.lbcode) != 5
 f.lbcode[0] == 1
 THEN
-CoordAndDims(DimCoord(f.regular_points("x"), standard_name=f._x_coord_name(), units='degrees', circular=(f.lbhem in [0, 4]), coord_system=f.coord_system()), 1)
+CoordAndDims(DimCoord.from_regular(f.bzx, f.bdx, f.lbnpt, standard_name=f._x_coord_name(), units='degrees', circular=(f.lbhem in [0, 4]), coord_system=f.coord_system()), 1)
 
 # Regular longitude bounds
 IF
@@ -105,7 +105,7 @@ f.bdx != 0.0
 len(f.lbcode) != 5
 f.lbcode[0] == 2
 THEN
-CoordAndDims(DimCoord(f.regular_points("x"), standard_name=f._x_coord_name(), units='degrees', circular=(f.lbhem in [0, 4]), coord_system=f.coord_system(), bounds=f.regular_bounds("x")), 1)
+CoordAndDims(DimCoord.from_regular(f.bzx, f.bdx, f.lbnpt, standard_name=f._x_coord_name(), units='degrees', circular=(f.lbhem in [0, 4]), coord_system=f.coord_system(), with_bounds=True), 1)
 
 # Regular latitude points
 IF
@@ -113,7 +113,7 @@ f.bdy != 0.0
 len(f.lbcode) != 5
 f.lbcode[0] == 1
 THEN
-CoordAndDims(DimCoord(f.regular_points("y"), standard_name=f._y_coord_name(), units='degrees', coord_system=f.coord_system()), 0)
+CoordAndDims(DimCoord.from_regular(f.bzy, f.bdy, f.lbrow, standard_name=f._y_coord_name(), units='degrees', coord_system=f.coord_system()), 0)
 
 # Regular latitude bounds
 IF
@@ -121,7 +121,7 @@ f.bdy != 0.0
 len(f.lbcode) != 5
 f.lbcode[0] == 2
 THEN
-CoordAndDims(DimCoord(f.regular_points("y"), standard_name=f._y_coord_name(), units='degrees', coord_system=f.coord_system(), bounds=f.regular_bounds("y")), 0)
+CoordAndDims(DimCoord.from_regular(f.bzy, f.bdy, f.lbrow, standard_name=f._y_coord_name(), units='degrees', coord_system=f.coord_system(), with_bounds=True), 0)
 
 # Irregular latitude
 IF
@@ -161,7 +161,7 @@ len(f.lbcode) == 5
 f.lbcode.ix == 10
 f.bdx != 0
 THEN
-CoordAndDims(DimCoord(f.regular_points("x"), standard_name=f._y_coord_name(), units='degrees', coord_system=f.coord_system()), 1)
+CoordAndDims(DimCoord.from_regular(f.bzx, f.bdx, f.lbnpt, standard_name=f._y_coord_name(), units='degrees', coord_system=f.coord_system()), 1)
 
 IF
 len(f.lbcode) == 5
@@ -202,7 +202,7 @@ f.lbcode[-1] == 1
 f.lbcode.ix == 13
 f.bdx != 0
 THEN
-CoordAndDims(DimCoord(f.regular_points("x"), long_name='site_number', units='1'), 1)
+CoordAndDims(DimCoord.from_regular(f.bzx, f.bdx, f.lbnpt, long_name='site_number', units='1'), 1)
 
 
 # as a special case to some cross section lbcodes (currently only site), lons are encoded in lower_x_domain and upper_x_domain
