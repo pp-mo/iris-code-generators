@@ -92,9 +92,13 @@ def _write_rule(module_file, conditions, actions):
             action = fmt.format(action[13:-1])
         elif action.startswith('CoordAndDims(AuxCoord('):
             action = action[13:-1]
+            # Rudimentary check to see if a dimension was supplied to
+            # the CoordAndDims constructor.
             if action[-1] == ')':
+                # Original was: CoordAndDims(AuxCoord(...))
                 fmt = 'aux_coords_and_dims.append(({}, None))'
             else:
+                # Original was: CoordAndDims(AuxCoord(...), <expr>)
                 fmt = 'aux_coords_and_dims.append(({}))'
             action = fmt.format(action)
         elif action.startswith('CellMethod('):
