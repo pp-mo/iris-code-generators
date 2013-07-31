@@ -55,15 +55,22 @@ import iris.fileformats.pp
 import iris.unit
 
 
-def convert(cube, {field_var_name}):
-    cm = cube
+def convert({field_var_name}):
     factories = []
     references = []
+    standard_name = None
+    long_name = None
+    units = None
+    attributes = {{}}
+    cell_methods = []
+    dim_coords_and_dims = []
+    aux_coords_and_dims = []
 '''
 
 
 FOOTER = '''
-    return factories, references
+    return (factories, references, standard_name, long_name, units, attributes,
+            cell_methods, dim_coords_and_dims, aux_coords_and_dims)
 '''
 
 def _write_rule(module_file, conditions, actions):
@@ -79,41 +86,38 @@ def _write_rule(module_file, conditions, actions):
         if action.startswith('CoordAndDims(DimCoord('):
             match = re.match(r'CoordAndDims\((.*), ([0-1]+)\)$', action)
             if match:
-                action = 'cube.add_dim_coord({})'.format(action[13:-1])
+                fmt = 'dim_coords_and_dims.append(({}))'
             else:
-                action = 'cube.add_aux_coord({})'.format(action[13:-1])
+                fmt = 'aux_coords_and_dims.append(({}, None))'
+            action = fmt.format(action[13:-1])
         elif action.startswith('CoordAndDims(AuxCoord('):
-            action = 'cube.add_aux_coord({})'.format(action[13:-1])
+            action = action[13:-1]
+            # Rudimentary check to see if a dimension was supplied to
+            # the CoordAndDims constructor.
+            if action[-1] == ')':
+                # Original was: CoordAndDims(AuxCoord(...))
+                fmt = 'aux_coords_and_dims.append(({}, None))'
+            else:
+                # Original was: CoordAndDims(AuxCoord(...), <expr>)
+                fmt = 'aux_coords_and_dims.append(({}))'
+            action = fmt.format(action)
         elif action.startswith('CellMethod('):
-            action = 'cube.add_cell_method({})'.format(action)
+            if 'cm.coord(' in action:
+                action = action[:-1].replace('cm.coord(', 'coords=')
+            action = 'cell_methods.append({})'.format(action)
         elif action.startswith('CMCustomAttribute('):
             match = re.match(
                 r'CMCustomAttribute\(([\'"0-9a-zA-Z_]+), ?(.+)\)$', action)
             name = match.group(1)
             value = match.group(2)
-            action = 'cube.attributes[{}] = {}'.format(name, value)
+            action = 'attributes[{}] = {}'.format(name, value)
         elif action.startswith('CMAttribute('):
             match = re.match(r'CMAttribute\(([\'"0-9a-zA-Z_]+), (.+)\)$',
                              action)
             name = eval(match.group(1))
+            assert name in ('standard_name', 'long_name', 'units')
             value = match.group(2)
-            # Temporary code to deal with invalid standard names from
-            # the translation table(s).
-            if name == 'standard_name':
-                action = 'cube.rename({})'.format(value)
-            # Temporary code to deal with invalid units in the
-            # translation table(s).
-            elif name == 'units':
-                action = '''units = {}
-        try:
-            setattr(cube, 'units', units)
-        except ValueError:
-            msg = 'Ignoring PP invalid units {{!r}}'.format(units)
-            warnings.warn(msg)
-            cube.attributes['invalid_units'] = units
-            cube.units = iris.unit._UNKNOWN_UNIT_STRING'''.format(value)
-            else:
-                action = 'cube.{} = {}'.format(name, value)
+            action = '{} = {}'.format(name, value)
         elif action.startswith('Factory('):
             action = 'factories.append({})'.format(action)
         elif action.startswith('ReferenceTarget('):
