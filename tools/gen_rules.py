@@ -1,4 +1,4 @@
-# (C) British Crown Copyright 2013, Met Office
+# (C) British Crown Copyright 2013 - 2014, Met Office
 #
 # This file is part of Iris-code-generators.
 #
@@ -17,29 +17,12 @@
 
 from datetime import datetime
 import os
-import os.path
 import re
 
+import gen_helpers
 
 HEADER = \
-'''# (C) British Crown Copyright 2013 - {year}, Met Office
-#
-# This file is part of Iris.
-#
-# Iris is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License as published by the
-# Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Iris is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Lesser General Public License for more details.
-#
-# You should have received a copy of the GNU Lesser General Public License
-# along with Iris.  If not, see <http://www.gnu.org/licenses/>.
-
-# DO NOT EDIT DIRECTLY
+    '''
 # Auto-generated from SciTools/iris-code-generators:tools/gen_rules.py
 
 import warnings
@@ -73,7 +56,6 @@ FOOTER = '''
             cell_methods, dim_coords_and_dims, aux_coords_and_dims)
 '''
 
-YEAR = datetime.utcnow().year
 
 def _write_rule(module_file, conditions, actions):
     module_file.write('\n')
@@ -129,24 +111,15 @@ def _write_rule(module_file, conditions, actions):
         module_file.write('        {}\n'.format(action))
 
 
-def _absolute_path(path):
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
-
-
 def write_rules_module(field_var_name, rules_paths, module_path):
     # Define state constants
     IN_CONDITION = 1
     IN_ACTION = 2
-
-    module_path = _absolute_path(module_path)
-    module_dir = os.path.dirname(module_path)
-    if not os.path.isdir(module_dir):
-        os.makedirs(module_dir)
-    with open(module_path, 'w') as module_file:
-        module_file.write(HEADER.format(year=YEAR,
-                                        field_var_name=field_var_name))
+    gen_helpers.prep_module_file(module_path)
+    with open(module_path, 'a') as module_file:
+        module_file.write(HEADER.format(field_var_name=field_var_name))
         for rules_path in rules_paths:
-            rules_path = _absolute_path(rules_path)
+            rules_path = gen_helpers.absolute_path(rules_path)
             print 'rules_path:', rules_path
             with open(rules_path, 'r') as rules_file:
                 conditions = []
