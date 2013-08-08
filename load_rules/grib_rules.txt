@@ -50,8 +50,8 @@ CoordAndDims(DimCoord(grib._x_points, grib._x_coord_name, units='degrees', coord
 IF
 grib.gridType in ["polar_stereographic", "lambert"]
 THEN
-CoordAndDims(DimCoord(grib._y_points, grib._y_coord_name, units=None, coord_system=grib._coord_system), 0)
-CoordAndDims(DimCoord(grib._x_points, grib._x_coord_name, units=None, coord_system=grib._coord_system), 1)
+CoordAndDims(DimCoord(grib._y_points, grib._y_coord_name, units="m", coord_system=grib._coord_system), 0)
+CoordAndDims(DimCoord(grib._x_points, grib._x_coord_name, units="m", coord_system=grib._coord_system), 1)
 
 
 
