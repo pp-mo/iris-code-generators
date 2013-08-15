@@ -312,20 +312,21 @@ f.lbproc not in [0, 128, 4096, 8192]
 THEN
 CMCustomAttribute("ukmo__process_flags", tuple(sorted([iris.fileformats.pp.lbproc_map[flag] for flag in f.lbproc.flags])))
 
-# Height rule 1 of 2 - non 1.5m temperature.
+# Height rule 1 of 2 - (non height-constrained stashes).
 IF
 f.lbvc == 1
 not (f.lbuser[6] == 1 and f.lbuser[3] == 3236)
 f.blev != -1
+str(f.stash) not in STASH_CONSTRAINED_TO_CF
 THEN
 #heightRef = "geometric"
 CoordAndDims(DimCoord(f.blev, standard_name='height', units='m', attributes={'positive': 'up'}))
 
-# Height rule 2 of 2 - 1.5m temperature.
+# Height rule 2 of 2 - 'constrained' stashes, which fix a height value.
 IF
-f.lbuser[6] == 1 and f.lbuser[3] == 3236
+str(f.stash) in STASH_CONSTRAINED_TO_CF
 THEN
-CoordAndDims(DimCoord(1.5, standard_name='height', units='m', attributes={'positive': 'up'}))
+CoordAndDims(DimCoord([STASH_CONSTRAINED_TO_CF[str(f.stash)].height, standard_name='height', units='m', attributes={'positive': 'up'}))
 
 # Depth - non cross-sections.
 IF
@@ -462,13 +463,29 @@ CMAttribute('standard_name', MOSIG_STASH_TO_CF[str(f.stash)].name)
 CMAttribute('units', MOSIG_STASH_TO_CF[str(f.stash)].unit)
 CMAttribute('long_name', None)
 
-# UM stash code to CF meta-data rule.
+# UM stash code (unconstrained) to CF meta-data rule.
 IF
 str(f.stash) in STASH_TO_CF
 THEN
 CMAttribute("standard_name", STASH_TO_CF[str(f.stash)].cfname)
 CMAttribute("units", STASH_TO_CF[str(f.stash)].unit) 
 CMAttribute("long_name", None)
+#
+# PP note: ? why don't we support on non-CF name for stash translations
+#  (when we do for Grib) ?
+#
+
+# UM stash code (constrained) to CF meta-data rule.
+IF
+str(f.stash) in STASH_CONSTRAINED_TO_CF
+THEN
+CMAttribute("standard_name", STASH_CONSTRAINED_TO_CF[str(f.stash)].cfname)
+CMAttribute("units", STASH_CONSTRAINED_TO_CF[str(f.stash)].unit) 
+CMAttribute("long_name", None)
+#
+# PP note: ? why don't we support on non-CF name for stash translations
+#  (when we do for Grib) ?
+#
 
 # UM field code to CF meta-data rule.
 IF
