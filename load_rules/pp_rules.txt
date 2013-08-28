@@ -94,6 +94,7 @@ CoordAndDims(AuxCoord('son', long_name='season', units='no_unit'))
 # Regular longitude points
 IF
 f.bdx != 0.0
+f.bdx != f.bmdi
 len(f.lbcode) != 5
 f.lbcode[0] == 1
 THEN
@@ -102,6 +103,7 @@ CoordAndDims(DimCoord.from_regular(f.bzx, f.bdx, f.lbnpt, standard_name=f._x_coo
 # Regular longitude bounds
 IF
 f.bdx != 0.0
+f.bdx != f.bmdi
 len(f.lbcode) != 5
 f.lbcode[0] == 2
 THEN
@@ -110,6 +112,7 @@ CoordAndDims(DimCoord.from_regular(f.bzx, f.bdx, f.lbnpt, standard_name=f._x_coo
 # Regular latitude points
 IF
 f.bdy != 0.0
+f.bdy != f.bmdi
 len(f.lbcode) != 5
 f.lbcode[0] == 1
 THEN
@@ -118,6 +121,7 @@ CoordAndDims(DimCoord.from_regular(f.bzy, f.bdy, f.lbrow, standard_name=f._y_coo
 # Regular latitude bounds
 IF
 f.bdy != 0.0
+f.bdy != f.bmdi
 len(f.lbcode) != 5
 f.lbcode[0] == 2
 THEN
@@ -125,7 +129,7 @@ CoordAndDims(DimCoord.from_regular(f.bzy, f.bdy, f.lbrow, standard_name=f._y_coo
 
 # Irregular latitude
 IF
-f.bdy == 0.0
+f.bdy == 0.0 or f.bdy == f.bmdi
 len(f.lbcode) != 5 or (len(f.lbcode) == 5 and f.lbcode.iy == 10)
 # TODO What about lbcode in [2, 102]. How does this affect the bounds?
 THEN
@@ -133,7 +137,7 @@ CoordAndDims(DimCoord(f.y, standard_name=f._y_coord_name(), units='degrees', bou
 
 # Irregular longitude
 IF
-f.bdx == 0.0
+f.bdx == 0.0 or f.bdx == f.bmdi
 len(f.lbcode) != 5 or (len(f.lbcode) == 5 and f.lbcode.ix == 11)
 # TODO What about lbcode in [2, 102]. How does this affect the bounds?
 THEN
@@ -160,13 +164,14 @@ IF
 len(f.lbcode) == 5
 f.lbcode.ix == 10
 f.bdx != 0
+f.bdx != f.bmdi
 THEN
 CoordAndDims(DimCoord.from_regular(f.bzx, f.bdx, f.lbnpt, standard_name=f._y_coord_name(), units='degrees', coord_system=f.coord_system()), 1)
 
 IF
 len(f.lbcode) == 5
 f.lbcode.iy == 1
-f.bdy == 0
+f.bdy == 0 or f.bdy == f.bmdi
 THEN
 # TODO: Is this 'air_pressure', 'sea_water_pressure', or ...?
 CoordAndDims(DimCoord(f.y, long_name='pressure', units='hPa', bounds=f.y_bounds), 0)
@@ -174,7 +179,7 @@ CoordAndDims(DimCoord(f.y, long_name='pressure', units='hPa', bounds=f.y_bounds)
 IF
 len(f.lbcode) == 5
 f.lbcode.ix == 1
-f.bdx == 0
+f.bdx == 0 or f.bdx == f.bmdi
 THEN
 # TODO: Is this 'air_pressure', 'sea_water_pressure', or ...?
 CoordAndDims(DimCoord(f.x, long_name='pressure', units='hPa', bounds=f.x_bounds), 1)
