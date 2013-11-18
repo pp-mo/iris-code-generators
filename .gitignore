@@ -34,3 +34,9 @@ outputs/*
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Created by editiors
+*~
+\#*
+\.\#*
+*.swp
