@@ -68,15 +68,12 @@ def build_um_cf_map(fuseki, filename):
 
         # Encode the relevant UM to CF translations.
         mappings = fuseki.retrieve_mappings('um', 'cf')
-        for mapping in FieldcodeCFMapping(mappings):
-            fhandle.write(mapping)
-        for mapping in StashCFMapping(mappings):
-            fhandle.write(mapping)
+        fhandle.writelines(FieldcodeCFMapping(mappings).lines())
+        fhandle.writelines(StashCFMapping(mappings).lines())
 
         # Encode the relevant CF to UM translations.
         mappings = fuseki.retrieve_mappings('cf', 'um')
-        for mapping in CFFieldcodeMapping(mappings):
-            fhandle.write(mapping)
+        fhandle.writelines(CFFieldcodeMapping(mappings).lines())
 
 
 if __name__ == '__main__':

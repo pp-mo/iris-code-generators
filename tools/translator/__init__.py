@@ -20,7 +20,7 @@ translations.
 
 """
 
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 from collections import namedtuple
 import warnings
 
@@ -43,6 +43,22 @@ class Mapping(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, mappings):
+        """
+        Filter the given sequence of mappings for those member
+        :class:`metocean.Mapping` translations containing a source
+        :class`metocean.Concept` with a matching
+        :attribute:`Mapping.source_scheme` and a target
+        :class:`metocean.Concept` with a matching
+        :attribute:`Mapping.target_scheme`.
+
+        Also see :method:`Mapping.valid_mapping` for further matching
+        criterion for candidate metOcean mapping translations.
+
+        Args:
+        * mappings:
+            Iterator of :class:`metocean.Mapping` instances.
+
+        """
         temp = []
         # Filter the mappings for the required type of translations.
         for mapping in mappings:
@@ -57,8 +73,15 @@ class Mapping(object):
             msg = '{!r} contains no mappings.'
             warnings.warn(msg.format(self.__class__.__name__))
 
-    def __iter__(self):
-        """Provide an iterator of the encoded metOcean mappings."""
+    def lines(self):
+        """
+        Provides an iterator generating the encoded string representation
+        of each member of this metOcean mapping translation.
+
+        Returns:
+            An iterator of string.
+
+        """
         lines = ['\n%s = {\n' % self.mapping_name]
         payload = [self.encode(mapping) for mapping in self.mappings]
         lines.extend(payload)
@@ -80,12 +103,39 @@ class Mapping(object):
 
         """
 
+    @abstractproperty
+    def mapping_name(self):
+        """
+        Abstract property that specifies the name of the dictionary
+        to contain the encoding of this metOcean mapping translation.
+
+        """
+    
+    @abstractproperty
+    def source_scheme(self):
+        """
+        Abstract property that specifies the name of the scheme for
+        the source :class:`metocean.Concept` defining this metOcean
+        mapping translation.
+
+        """
+
+    @abstractproperty
+    def target_scheme(self):
+        """
+        Abstract property that specifies the name of the scheme for
+        the target :class:`metocean.Concept` defining this metOcean
+        mapping translation.
+
+        """
+
     @abstractmethod
     def valid_mapping(self, mapping):
         """
-        Abstract method that determines whether the provided mapping
-        is a translation for the required source concept to the
-        required target concept.
+        Abstract method that determines whether the provided
+        :class:`metocean.Mapping` is a translation for the required
+        source :class:`metocean.Concept` to the required target
+        :class:`metocean.Concept`.
 
         """
 
@@ -188,10 +238,6 @@ class CFFieldcodeMapping(Mapping):
     and units to UM field-code.
 
     """
-    source_scheme = 'cf'
-    target_scheme = 'um'
-    mapping_name = 'CF_TO_LBFC'
-
     def _key(self, mapping):
         """Provides the sort key of the mappings order."""
         return self.cf_phenomenon_notation(mapping.source)
@@ -217,10 +263,37 @@ class CFFieldcodeMapping(Mapping):
         lbfc = mapping.target.lbfc.value.notation
         return msg.format(lbfc=lbfc, **cf._asdict())
 
+    @property
+    def mapping_name(self):
+        """
+        Property that specifies the name of the dictionary to contain the
+        encoding of this metOcean mapping translation.
+
+        """
+        return 'CF_TO_LBFC'
+
+    @property
+    def source_scheme(self):
+        """
+        Property that specifies the name of the scheme for the source
+        :class:`metocean.Concept` defining this metOcean mapping translation.
+
+        """
+        return 'cf'
+
+    @property
+    def target_scheme(self):
+        """
+        Property that specifies the name of the scheme for the target
+        :class:`metocean.Concept` defining this metOcean mapping translation.
+
+        """
+        return 'um'
+
     def valid_mapping(self, mapping):
         """
-        Determine whether the provided mapping represents a CF to
-        UM field-code translation.
+        Determine whether the provided :class:`metocean.Mapping` represents a
+        CF to UM field-code translation.
 
         Args:
         * mapping:
@@ -243,10 +316,6 @@ class FieldcodeCFMapping(Mapping):
     CF standard name, long name, and units.
 
     """
-    source_scheme = 'um'
-    target_scheme = 'cf'
-    mapping_name = 'LBFC_TO_CF'
-
     def _key(self, mapping):
         """Provides the sort key of the mappings order."""
         return int(mapping.source.lbfc.value.notation)
@@ -272,10 +341,37 @@ class FieldcodeCFMapping(Mapping):
         cf = self.cf_phenomenon_notation(mapping.target)
         return msg.format(lbfc=lbfc, **cf._asdict())
 
+    @property
+    def mapping_name(self):
+        """
+        Property that specifies the name of the dictionary to contain the
+        encoding of this metOcean mapping translation.
+
+        """
+        return 'LBFC_TO_CF'
+
+    @property
+    def source_scheme(self):
+        """
+        Property that specifies the name of the scheme for the source
+        :class:`metocean.Concept` defining this metOcean mapping translation.
+
+        """
+        return 'um'
+
+    @property
+    def target_scheme(self):
+        """
+        Property that specifies the name of the scheme for the target
+        :class:`metocean.Concept` defining this metOcean mapping translation.
+
+        """
+        return 'cf'
+
     def valid_mapping(self, mapping):
         """
-        Determine whether the provided mapping represents a UM field-code
-        to CF translation.
+        Determine whether the provided :class:`metocean.Mapping` represents a
+        UM field-code to CF translation.
 
         Args:
         * mapping:
@@ -298,10 +394,6 @@ class StashCFMapping(Mapping):
     standard name, long name, and units.
 
     """
-    source_scheme = 'um'
-    target_scheme = 'cf'
-    mapping_name = 'STASH_TO_CF'
-
     def _key(self, mapping):
         """Provides the sort key of the mappings order."""
         return mapping.source.stash.value.notation
@@ -327,10 +419,37 @@ class StashCFMapping(Mapping):
         cf = self.cf_phenomenon_notation(mapping.target)
         return msg.format(stash=stash, **cf._asdict())
 
+    @property
+    def mapping_name(self):
+        """
+        Property that specifies the name of the dictionary to contain the
+        encoding of this metOcean mapping translation.
+
+        """
+        return 'STASH_TO_CF'
+
+    @property
+    def source_scheme(self):
+        """
+        Property that specifies the name of the scheme for the source
+        :class:`metocean.Concept` defining this metOcean mapping translation.
+
+        """
+        return 'um'
+
+    @property
+    def target_scheme(self):
+        """
+        Property that specifies the name of the scheme for the target
+        :class:`metocean.Concept` defining this metOcean mapping translation.
+
+        """
+        return 'cf'
+
     def valid_mapping(self, mapping):
         """
-        Determine whether the provided mapping represents a UM stash-code to
-        CF translation.
+        Determine whether the provided :class:`metocean.Mapping` represents a
+        UM stash-code to CF translation.
 
         Args:
         * mapping:
