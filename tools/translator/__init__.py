@@ -24,7 +24,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from collections import namedtuple
 import warnings
 
-from metocean.fuseki import FusekiServer
+from metarelate.fuseki import FusekiServer
 
 
 # Restrict the tokens exported from this module.
@@ -45,10 +45,10 @@ class Mapping(object):
     def __init__(self, mappings):
         """
         Filter the given sequence of mappings for those member
-        :class:`metocean.Mapping` translations containing a source
-        :class`metocean.Concept` with a matching
+        :class:`metarelate.Mapping` translations containing a source
+        :class`metarelate.Concept` with a matching
         :attribute:`Mapping.source_scheme` and a target
-        :class:`metocean.Concept` with a matching
+        :class:`metarelate.Concept` with a matching
         :attribute:`Mapping.target_scheme`.
 
         Also see :method:`Mapping.valid_mapping` for further matching
@@ -56,7 +56,7 @@ class Mapping(object):
 
         Args:
         * mappings:
-            Iterator of :class:`metocean.Mapping` instances.
+            Iterator of :class:`metarelate.Mapping` instances.
 
         """
         temp = []
@@ -76,7 +76,7 @@ class Mapping(object):
     def lines(self):
         """
         Provides an iterator generating the encoded string representation
-        of each member of this metOcean mapping translation.
+        of each member of this metarelate mapping translation.
 
         Returns:
             An iterator of string.
@@ -99,7 +99,7 @@ class Mapping(object):
     def encode(self, mapping):
         """
         Abstract method to return the chosen encoded representation
-        of a metOcean mapping translation.
+        of a metarelate mapping translation.
 
         """
 
@@ -107,7 +107,7 @@ class Mapping(object):
     def mapping_name(self):
         """
         Abstract property that specifies the name of the dictionary
-        to contain the encoding of this metOcean mapping translation.
+        to contain the encoding of this metarelate mapping translation.
 
         """
     
@@ -115,7 +115,7 @@ class Mapping(object):
     def source_scheme(self):
         """
         Abstract property that specifies the name of the scheme for
-        the source :class:`metocean.Concept` defining this metOcean
+        the source :class:`metarelate.Concept` defining this metarelate
         mapping translation.
 
         """
@@ -124,7 +124,7 @@ class Mapping(object):
     def target_scheme(self):
         """
         Abstract property that specifies the name of the scheme for
-        the target :class:`metocean.Concept` defining this metOcean
+        the target :class:`metarelate.Concept` defining this metarelate
         mapping translation.
 
         """
@@ -133,9 +133,9 @@ class Mapping(object):
     def valid_mapping(self, mapping):
         """
         Abstract method that determines whether the provided
-        :class:`metocean.Mapping` is a translation for the required
-        source :class:`metocean.Concept` to the required target
-        :class:`metocean.Concept`.
+        :class:`metarelate.Mapping` is a translation for the required
+        source :class:`metarelate.Concept` to the required target
+        :class:`metarelate.Concept`.
 
         """
 
@@ -151,7 +151,7 @@ class Mapping(object):
 
         Args:
         * concept:
-            A :class:`metocean.Concept` instance for a CF scheme.
+            A :class:`metarelate.Concept` instance for a CF scheme.
 
         Returns:
             Tuple containing the CF standard name, long name and units.
@@ -173,11 +173,11 @@ class Mapping(object):
 
         Args:
         * concept:
-            A :class:`metocean.Concept` instance.
+            A :class:`metarelate.Concept` instance.
 
         Kwags:
         * kind:
-            The type of :class:`metocean.Concept`.
+            The type of :class:`metarelate.Concept`.
             Defaults to 'field'.
 
         Return:
@@ -198,7 +198,7 @@ class Mapping(object):
 
         Args:
         * concept:
-            A :class:`metocean.Concept` instance.
+            A :class:`metarelate.Concept` instance.
 
         Returns:
             Boolean.
@@ -216,7 +216,7 @@ class Mapping(object):
 
         Args:
         * concept:
-            A :class:`metocean.Concept` instance.
+            A :class:`metarelate.Concept` instance.
 
         Returns:
             Boolean.
@@ -230,7 +230,7 @@ class Mapping(object):
 
 class CFFieldcodeMapping(Mapping):
     """
-    Represents a container for CF to UM field-code metOcean mapping
+    Represents a container for CF to UM field-code metarelate mapping
     translations.
 
     Encoding support is provided to generate the Python dictionary source
@@ -250,7 +250,7 @@ class CFFieldcodeMapping(Mapping):
 
         Args:
         * mapping:
-            A :class:`metocean.Mapping` instance representing a translation
+            A :class:`metarelate.Mapping` instance representing a translation
             from CF to UM field-code.
 
         Returns:
@@ -267,7 +267,7 @@ class CFFieldcodeMapping(Mapping):
     def mapping_name(self):
         """
         Property that specifies the name of the dictionary to contain the
-        encoding of this metOcean mapping translation.
+        encoding of this metarelate mapping translation.
 
         """
         return 'CF_TO_LBFC'
@@ -276,7 +276,7 @@ class CFFieldcodeMapping(Mapping):
     def source_scheme(self):
         """
         Property that specifies the name of the scheme for the source
-        :class:`metocean.Concept` defining this metOcean mapping translation.
+        :class:`metarelate.Concept` defining this metarelate mapping translation.
 
         """
         return 'cf'
@@ -285,19 +285,19 @@ class CFFieldcodeMapping(Mapping):
     def target_scheme(self):
         """
         Property that specifies the name of the scheme for the target
-        :class:`metocean.Concept` defining this metOcean mapping translation.
+        :class:`metarelate.Concept` defining this metarelate mapping translation.
 
         """
         return 'um'
 
     def valid_mapping(self, mapping):
         """
-        Determine whether the provided :class:`metocean.Mapping` represents a
+        Determine whether the provided :class:`metarelate.Mapping` represents a
         CF to UM field-code translation.
 
         Args:
         * mapping:
-            A :class:`metocean.Mapping` instance.
+            A :class:`metarelate.Mapping` instance.
 
         Return:
             Boolean.
@@ -308,7 +308,7 @@ class CFFieldcodeMapping(Mapping):
 
 class FieldcodeCFMapping(Mapping):
     """
-    Represents a container for UM field-code to CF metOcean mapping
+    Represents a container for UM field-code to CF metarelate mapping
     translations.
 
     Encoding support is provided to generate the Python dictionary source
@@ -328,7 +328,7 @@ class FieldcodeCFMapping(Mapping):
 
         Args:
         * mapping:
-            A :class:`metocean.Mapping` instance representing a translation
+            A :class:`metarelate.Mapping` instance representing a translation
             from UM field-code to CF.
 
         Returns:
@@ -345,7 +345,7 @@ class FieldcodeCFMapping(Mapping):
     def mapping_name(self):
         """
         Property that specifies the name of the dictionary to contain the
-        encoding of this metOcean mapping translation.
+        encoding of this metarelate mapping translation.
 
         """
         return 'LBFC_TO_CF'
@@ -354,7 +354,7 @@ class FieldcodeCFMapping(Mapping):
     def source_scheme(self):
         """
         Property that specifies the name of the scheme for the source
-        :class:`metocean.Concept` defining this metOcean mapping translation.
+        :class:`metarelate.Concept` defining this metarelate mapping translation.
 
         """
         return 'um'
@@ -363,19 +363,19 @@ class FieldcodeCFMapping(Mapping):
     def target_scheme(self):
         """
         Property that specifies the name of the scheme for the target
-        :class:`metocean.Concept` defining this metOcean mapping translation.
+        :class:`metarelate.Concept` defining this metarelate mapping translation.
 
         """
         return 'cf'
 
     def valid_mapping(self, mapping):
         """
-        Determine whether the provided :class:`metocean.Mapping` represents a
+        Determine whether the provided :class:`metarelate.Mapping` represents a
         UM field-code to CF translation.
 
         Args:
         * mapping:
-            A :class:`metocean.Mapping` instance.
+            A :class:`metarelate.Mapping` instance.
 
         Returns:
             Boolean.
@@ -386,7 +386,7 @@ class FieldcodeCFMapping(Mapping):
 
 class StashCFMapping(Mapping):
     """
-    Represents a container for UM stash-code to CF metOcean mapping
+    Represents a container for UM stash-code to CF metarelate mapping
     translations.
 
     Encoding support is provided to generate the Python dictionary source
@@ -406,7 +406,7 @@ class StashCFMapping(Mapping):
 
         Args:
         * mapping:
-            A :class:`metocean.Mapping` instance representing a translation
+            A :class:`metarelate.Mapping` instance representing a translation
             from UM stash-code to CF.
 
         Returns:
@@ -423,7 +423,7 @@ class StashCFMapping(Mapping):
     def mapping_name(self):
         """
         Property that specifies the name of the dictionary to contain the
-        encoding of this metOcean mapping translation.
+        encoding of this metarelate mapping translation.
 
         """
         return 'STASH_TO_CF'
@@ -432,7 +432,7 @@ class StashCFMapping(Mapping):
     def source_scheme(self):
         """
         Property that specifies the name of the scheme for the source
-        :class:`metocean.Concept` defining this metOcean mapping translation.
+        :class:`metarelate.Concept` defining this metarelate mapping translation.
 
         """
         return 'um'
@@ -441,19 +441,19 @@ class StashCFMapping(Mapping):
     def target_scheme(self):
         """
         Property that specifies the name of the scheme for the target
-        :class:`metocean.Concept` defining this metOcean mapping translation.
+        :class:`metarelate.Concept` defining this metarelate mapping translation.
 
         """
         return 'cf'
 
     def valid_mapping(self, mapping):
         """
-        Determine whether the provided :class:`metocean.Mapping` represents a
+        Determine whether the provided :class:`metarelate.Mapping` represents a
         UM stash-code to CF translation.
 
         Args:
         * mapping:
-            A :class:`metocean.Mapping` instance.
+            A :class:`metarelate.Mapping` instance.
 
         Returns:
             Boolean.
