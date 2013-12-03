@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with iris-code-generators.  If not, see <http://www.gnu.org/licenses/>.
 """
-Processing of metOcean content to provide Iris encodings of
+Processing of metarelate metOcean content to provide Iris encodings of
 metOcean mapping translations.
 
 """
@@ -23,7 +23,7 @@ metOcean mapping translations.
 from datetime import datetime
 import os.path
 
-from metocean.fuseki import FusekiServer
+from metarelate.fuseki import FusekiServer
 
 from translator import CFFieldcodeMapping, FieldcodeCFMapping, StashCFMapping
 
