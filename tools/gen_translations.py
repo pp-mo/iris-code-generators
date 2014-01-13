@@ -28,7 +28,7 @@ from metarelate.fuseki import FusekiServer
 from translator import *
 
 
-HEADER = """# (C) British Crown Copyright {year}, Met Office
+HEADER = """# (C) British Crown Copyright 2013 - {year}, Met Office
 #
 # This file is part of Iris.
 #
