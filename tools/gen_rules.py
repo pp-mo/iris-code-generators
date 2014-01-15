@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Iris-code-generators.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
 import os
 import os.path
 import re
 
 
 HEADER = \
-'''# (C) British Crown Copyright 2013, Met Office
+'''# (C) British Crown Copyright 2013 - {year}, Met Office
 #
 # This file is part of Iris.
 #
@@ -71,6 +72,8 @@ FOOTER = '''
     return (factories, references, standard_name, long_name, units, attributes,
             cell_methods, dim_coords_and_dims, aux_coords_and_dims)
 '''
+
+YEAR = datetime.utcnow().year
 
 def _write_rule(module_file, conditions, actions):
     module_file.write('\n')
@@ -140,7 +143,8 @@ def write_rules_module(field_var_name, rules_paths, module_path):
     if not os.path.isdir(module_dir):
         os.makedirs(module_dir)
     with open(module_path, 'w') as module_file:
-        module_file.write(HEADER.format(field_var_name=field_var_name))
+        module_file.write(HEADER.format(year=YEAR,
+                                        field_var_name=field_var_name))
         for rules_path in rules_paths:
             rules_path = _absolute_path(rules_path)
             print 'rules_path:', rules_path
