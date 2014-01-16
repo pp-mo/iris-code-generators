@@ -20,41 +20,70 @@ from iris.fileformats.pp import STASH
 
 import gen_helpers
 
-HEADER = ('\n# Auto-generated from '
-          'SciTools/iris-code-generators:tools/gen_stash_refs.py'
-          '\n\n\n')
+
+HEADER = '''
+"""
+Auto-generated from SciTools/iris-code-generators:tools/gen_stash_refs.py
+Relates grid code and field code to the stash code.
+
+"""
+'''
+
+
+CODE_PREAMBLE = ("from collections import namedtuple\n\n\n"
+                 "Stash = namedtuple('Stash', 'grid_code field_code')\n\n\n")
 
 
 def write_cross_reference_module(module_path, xrefs):
     gen_helpers.prep_module_file(module_path)
     with open(module_path, 'a') as module_file:
         module_file.write(HEADER)
+        module_file.write(CODE_PREAMBLE)
         module_file.write('STASH_GRID = {\n')
         for xref in xrefs:
             stash = xref.get('stash')
             try:
-                STASH.from_msi(stash)
+                STASH.from_msi(stash.replace('"', ''))
             except ValueError:
                 msg = ('stash code is not of a recognised'
                        '"m??s??i???" form: {}'.format(stash))
+                print msg
             grid = xref.get('grid')
             try:
                 int(grid)
             except ValueError:
                 msg = ('grid code retrieved from STASH lookup'
                        'is not an interger: {}'.format(grid))
-            module_file.write("    {}: {},\n".format(stash, grid))
-        module_file.write('}\n')
+                print msg
+            lbfc = xref.get('lbfcn')
+            try:
+                int(lbfc)
+            except (ValueError, TypeError):
+                lbfc = 0
+            module_file.write(
+                "    {}: Stash({}, {}),\n".format(stash, grid, lbfc))
+        module_file.write('    }\n')
 
 
 def stash_grid_codes(fu_p):
     query = '''
-    select ?stash ?grid
-    where {
-    GRAPH <http://um/stashconcepts.ttl> {
-    ?stashcode <http://reference.metoffice.gov.uk/def/um/umdp/c4/Grid> ?grid ;
-    <http://www.w3.org/2004/02/skos/core#notation> ?stash .
-    }}
+    SELECT ?stash ?grid ?lbfcn
+    WHERE
+    {
+      GRAPH <http://um/stashconcepts.ttl>
+        {
+          ?stashcode moumdpC4:Grid ?grid ;
+          <http://www.w3.org/2004/02/skos/core#notation> ?stash .
+          OPTIONAL {?stashcode moumdpC4:PPFC ?lbfc .}
+        }
+      OPTIONAL
+      {
+        GRAPH <http://um/fieldcode.ttl>
+          {
+            ?lbfc <http://www.w3.org/2004/02/skos/core#notation> ?lbfcn
+          }
+      }
+    }
     order by ?stashcode
     '''
     xrefs = fu_p.run_query(query)
