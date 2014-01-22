@@ -36,8 +36,8 @@ HEADER = \
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with Iris.  If not, see <http://www.gnu.org/licenses/>.
-
-# DO NOT EDIT DIRECTLY'''
+#
+# DO NOT EDIT: AUTO-GENERATED'''
 
 
 def absolute_path(path):
