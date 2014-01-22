@@ -39,7 +39,7 @@ def write_cross_reference_module(module_path, xrefs):
     with open(module_path, 'a') as module_file:
         module_file.write(HEADER)
         module_file.write(CODE_PREAMBLE)
-        module_file.write('STASH_GRID = {\n')
+        module_file.write('STASH_TRANS = {\n')
         for xref in xrefs:
             stash = xref.get('stash')
             try:
