@@ -62,7 +62,7 @@ def write_cross_reference_module(module_path, xrefs):
                 lbfc = 0
             module_file.write(
                 "    {}: Stash({}, {}),\n".format(stash, grid, lbfc))
-        module_file.write('    }\n')
+        module_file.write('}\n')
 
 
 def stash_grid_codes(fu_p):
