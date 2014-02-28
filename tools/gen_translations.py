@@ -73,7 +73,7 @@ Provides UM/CF phenomenon translations.
 
 DIR_BASE = '../outputs/iris/fileformats'
 FILE_UM_CF = os.path.join(DIR_BASE, 'um_cf_map.py')
-FILE_GRIB_CF = os.path.join(DIR_BASE, 'grib', '_grib_cf_map.py')
+FILE_GRIB_CF = os.path.join(DIR_BASE, 'grib', 'grib_cf_map.py')
 YEAR = datetime.utcnow().year
 
 
