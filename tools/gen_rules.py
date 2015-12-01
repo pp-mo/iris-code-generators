@@ -57,7 +57,7 @@ FOOTER = '''
 '''
 
 
-def _write_rule(module_file, conditions, actions):
+def _write_rule(module_file, conditions, actions, save_style=False):
     module_file.write('\n')
     if len(conditions) == 1:
         module_file.write('    if {}:\n'.format(conditions[0]))
@@ -67,51 +67,55 @@ def _write_rule(module_file, conditions, actions):
             module_file.write('            ({}) and \\\n'.format(condition))
         module_file.write('            ({}):\n'.format(conditions[-1]))
     for action in actions:
-        if action.startswith('CoordAndDims(DimCoord'):
-            match = re.match(r'CoordAndDims\((.*), ([0-1]+)\)$', action)
-            if match:
-                fmt = 'dim_coords_and_dims.append(({}))'
-            else:
-                fmt = 'aux_coords_and_dims.append(({}, None))'
-            action = fmt.format(action[13:-1])
-        elif action.startswith('CoordAndDims(AuxCoord('):
-            action = action[13:-1]
-            # Rudimentary check to see if a dimension was supplied to
-            # the CoordAndDims constructor.
-            if action[-1] == ')':
-                # Original was: CoordAndDims(AuxCoord(...))
-                fmt = 'aux_coords_and_dims.append(({}, None))'
-            else:
-                # Original was: CoordAndDims(AuxCoord(...), <expr>)
-                fmt = 'aux_coords_and_dims.append(({}))'
-            action = fmt.format(action)
-        elif action.startswith('CellMethod('):
-            if 'cm.coord(' in action:
-                action = action[:-1].replace('cm.coord(', 'coords=')
-            action = 'cell_methods.append({})'.format(action)
-        elif action.startswith('CMCustomAttribute('):
-            match = re.match(
-                r'CMCustomAttribute\(([\'"0-9a-zA-Z_]+), ?(.+)\)$', action)
-            name = match.group(1)
-            value = match.group(2)
-            action = 'attributes[{}] = {}'.format(name, value)
-        elif action.startswith('CMAttribute('):
-            match = re.match(r'CMAttribute\(([\'"0-9a-zA-Z_]+), (.+)\)$',
-                             action)
-            name = eval(match.group(1))
-            assert name in ('standard_name', 'long_name', 'units')
-            value = match.group(2)
-            action = '{} = {}'.format(name, value)
-        elif action.startswith('Factory('):
-            action = 'factories.append({})'.format(action)
-        elif action.startswith('ReferenceTarget('):
-            action = 'references.append({})'.format(action)
+        if save_style:
+            # save rules actions are plain code
+            pass
         else:
-            raise RuntimeError('unrecognised action: {}'.format(action))
+            if action.startswith('CoordAndDims(DimCoord'):
+                match = re.match(r'CoordAndDims\((.*), ([0-1]+)\)$', action)
+                if match:
+                    fmt = 'dim_coords_and_dims.append(({}))'
+                else:
+                    fmt = 'aux_coords_and_dims.append(({}, None))'
+                action = fmt.format(action[13:-1])
+            elif action.startswith('CoordAndDims(AuxCoord('):
+                action = action[13:-1]
+                # Rudimentary check to see if a dimension was supplied to
+                # the CoordAndDims constructor.
+                if action[-1] == ')':
+                    # Original was: CoordAndDims(AuxCoord(...))
+                    fmt = 'aux_coords_and_dims.append(({}, None))'
+                else:
+                    # Original was: CoordAndDims(AuxCoord(...), <expr>)
+                    fmt = 'aux_coords_and_dims.append(({}))'
+                action = fmt.format(action)
+            elif action.startswith('CellMethod('):
+                if 'cm.coord(' in action:
+                    action = action[:-1].replace('cm.coord(', 'coords=')
+                action = 'cell_methods.append({})'.format(action)
+            elif action.startswith('CMCustomAttribute('):
+                match = re.match(
+                    r'CMCustomAttribute\(([\'"0-9a-zA-Z_]+), ?(.+)\)$', action)
+                name = match.group(1)
+                value = match.group(2)
+                action = 'attributes[{}] = {}'.format(name, value)
+            elif action.startswith('CMAttribute('):
+                match = re.match(r'CMAttribute\(([\'"0-9a-zA-Z_]+), (.+)\)$',
+                                 action)
+                name = eval(match.group(1))
+                assert name in ('standard_name', 'long_name', 'units')
+                value = match.group(2)
+                action = '{} = {}'.format(name, value)
+            elif action.startswith('Factory('):
+                action = 'factories.append({})'.format(action)
+            elif action.startswith('ReferenceTarget('):
+                action = 'references.append({})'.format(action)
+            else:
+                raise RuntimeError('unrecognised action: {}'.format(action))
         module_file.write('        {}\n'.format(action))
 
 
-def write_rules_module(field_var_name, rules_paths, module_path):
+def write_rules_module(field_var_name, rules_paths, module_path, save_style=False):
     # Define state constants
     IN_CONDITION = 1
     IN_ACTION = 2
@@ -131,7 +135,8 @@ def write_rules_module(field_var_name, rules_paths, module_path):
                         continue
                     if line == "IF":
                         if conditions and actions:
-                            _write_rule(module_file, conditions, actions)
+                            _write_rule(module_file, conditions, actions,
+                                        save_style=save_style)
                         conditions = []
                         actions = []
                         state = IN_CONDITION
@@ -145,7 +150,8 @@ def write_rules_module(field_var_name, rules_paths, module_path):
                         msg = 'Rule file not read correctly at line no. {}\n{}'
                         raise RuntimeError(msg.format(line_no, line))
                 if conditions and actions:
-                    _write_rule(module_file, conditions, actions)
+                    _write_rule(module_file, conditions, actions,
+                                save_style=save_style)
         module_file.write(FOOTER)
 
 
